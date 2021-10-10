@@ -1,0 +1,144 @@
+fMoveOneCrippledLegSpeedMult     00df0b68   (? f6229c) 00F622A8    = 0.85....    00F62298
+                 hit once in 58461d, first loop, when crippled
+                 hit in 58461d when un/holstering
+                 quickload doesnt hit
+   fMoveTwoCrippledLegsSpeedMult    00df0b88   (? f622a8)             = ??? .75 ??
+   fFallLegDamageMult   (0.5)
+   iFallLegDamageChance (50, omfg why)
+
+   maxSpeedThreshold     not found
+   minSpeedThreshold     not found
+   fAnimationMult        not found
+   fadeOutReachGainSpeed not found
+   fadeInReachGainSpeed  not found
+   fMovementTargetAvoidRadiusMult ? eh prolly ai, next to it
+
+doubt it but maybe
+fProjectileKnockMultClutter
+fProjectileKnockMultProp
+fProjectileKnockMultBiped         0.25              00F6072c   not called on missle cripple
+fProjectileKnockMultTrap
+fMineExteriorRadiusMult
+fRockitDamageBonusWeightMult
+fRumbleShakeRadiusMult
+fRumbleShakeTimeMult
+fExplosionForceMultLinear         1                    F61F80
+fExplosionForceMultAngular        1  ? right after?
+fCameraShakeMultMin                0.0    >
+fCameraShakeExplosionDistMult             >   these 2 next to one/two crippled leg mults
+fVATSMoveCameraLimbMult            0.5
+fGetHitPainMult                    1.5
+
+sFirstPersonSkeleton
+fFirstPersonZoomMinMult
+fFirstPersonZoomMaxMult
+fFirstPersonHandFollowMult                0.85
+fFirstPersonHandChaseSeconds              2?
+fFirstPersonHandChaseSecondsAttack
+fFirstPersonCameraMult                    1.0      F5EA70    doesn't change w/ cripple... does nothing?
+fPhysicsDamageSpeedMult   ???   0
+fMoveNoWeaponMult               1.1 ???
+fJumpFallHeightMult             0.03
+
+fMoveRunMult          (4) not it
+SpeedMult             not found
+
+fMasserSpeed            0.25
+fSecundaSpeed           0.30
+fMoveBaseSpeed          77    must be what funcs are getting
+fMoveMinFlySpeed        5
+fMoveMaxFlySpeed        300
+fTrackSpeed             2.0
+
+fBuoyancyMultBody                1.0
+fBuoyancyMultExtremity           -0.3
+
+fPCTurnAnimMinTime               0.1
+fActorTurnAnimMinTime            0.3
+
+fMoveSwimWalkBase                0.5
+fMoveSwimRunBase                 0.5
+fMoveSwimWalkAthleticsMult       0.02   ? maybe if ground and water get mixed?
+fMoveSwimRunAthleticsMult        0.1
+fJumpSwimmingMult                2.0
+
+fCameraShakeTime                 1.25
+fJumpMoveMult                    0.3
+fJumpMoveBase                    0.0
+
+fPhysicsDamageSpeedBase          1.0
+
+
+fDispActorCharBase      -30
+fDispActorCharMult      10
+fDispActorRespBase      -50
+fDispActorRespMult      1
+
+fCharacterDefaultTurningSpeed         90
+fSpellCastingDetectionHitActorMod     40
+fActorAnimZAdjust                     1.8
+fNoticeTextTimePerCharacter           0.8
+fPlayerCharacterTurnMult              na
+
+fVanityModeDelay                  0.25
+fVanityModeAutoDelay              120
+   fVanityModeAutoXSpeed          7
+   fVanityModeAutoYSpeed          2       ???donno think 3rd person, think had mults?
+   fVanityModeXMult               30
+   fVanityModeYMult               10
+fChase3rdPersonVanityXYMult       0.5
+fChase3rdPersonZUnitsPerSecond
+
+stateOrTransitionChanged
+
+IsRunning
+PushActorAway ?
+
+POV Switch ???   sUActnTogglepov  ?
+
+IsPC1stPerson - may be able to trace        (GetHitLocation??? hm)
+
+key press  /  sUActnForward
+  FastForward ==== anim when running
+  iCombatCrippledTorsoHitStaggerChance
+  CGCrippleTimer ???
+     fForwardBias? FORWARD? FORWARD POWER?
+     relativeForwardForce
+     forwardRhs
+     delayed_forward_impulse
+     forward_slip_velocity / forwardSlipVelocity
+     skid_energy_distance
+     ^^^ mostly havok???
+
+6ee3cf GetSystemInfo - fukkkkk
+
+RightAttackCondition                100
+LeftAttackCondition                 100
+EnduranceCondition
+PerceptionCondition
+IgnoreCrippledLimbs         0    what?
+SpeedMult                   100
+Fatigue                     200
+
+
+prolly leftovers but fuk it
+fMagicProjectileBaseSpeed        1000
+fMagicCloudSpeedBase             750
+fMagicCloudSpeedScale            0.75
+fAbsorbMoveSpeed                 -500 ?
+
+==== havok stuff?
+fixLegs ????
+left_leg
+right_leg
+internalLegData
+legIndex
+====     not hit with quicksave or stims? not used? must be string to code
+"Your left leg is now crippled" sLeftLegDamagedMessage
+"Your right leg is now crippled" sRightLegDamagedMessage
+sLeftLegDamagedIcon
+sRightLegDamagedIcon
+sLeftLegDamagedByPlayerIcon
+sRightLegDamagedByPlayerIcon
+fMoveLegConditionMult ???  0.9  must be for not perfect legs? used ???  F610E0
+

@@ -1,0 +1,92 @@
+Just a copy paste of x64dbg breakpoint list
+
+Not entirely clean, notes and hunting
+
+
+Type     Address  Module/Label/Exception    State    Disassembly                             H Summary                                                                                                                             
+Software                                                                                       
+         008BA0EB fallout3.exe              Disabled lea edx,dword ptr ss:[esp+14]           0 ANIM 0 CHECK 
+         0042D239 fallout3.exe              Disabled jb fallout3.42D204                      0 ANIM 0 hurt loader
+         008A1AED fallout3.exe              Disabled fstp dword ptr ss:[esp],st(0)           0 ANIM CALL
+         008BA096 fallout3.exe              Disabled call fallout3.8B9BE0                    0 ANIM pre 3 - ptr set?
+         008B2F5F fallout3.exe              Disabled call fallout3.8B2CA0                    0 ANIM pre 4
+         008B2CB8 fallout3.exe              Disabled mov ebx,dword ptr ds:[esi+edx*8]        0 ANIM pre 5 - get 260 addy
+         00720699 fallout3.exe              Disabled call eax                                0 Anim dir set post 1
+         007206AF fallout3.exe              Disabled call fallout3.6F5B00                    0 Anim dir set post 2
+         007E8FA2 fallout3.exe              Disabled mov dword ptr ds:[ecx+94],esi           0 Anim key data
+         007888B2 fallout3.exe              Disabled call fallout3.6F58B0                    0 Anim key data pre
+         00789351 fallout3.exe              Disabled cmp byte ptr ds:[1075B28],0             0 Anim key orig 1
+         00789717 fallout3.exe              Disabled or dword ptr ss:[esp+1C],40             0 Anim key orig 2
+         00533787 fallout3.exe              Disabled call fallout3.41CB30                    0 Anim move dir - player.showanim
+         0072064F fallout3.exe              Disabled je fallout3.72073B                      0 Anim move dir set
+         0045DC81 fallout3.exe              Disabled mov word ptr ds:[esi+edi*2+9C],ax       0 Anim move status set FF not moving hardcode
+         0045F79F fallout3.exe              Disabled mov dword ptr ds:[esi+ebx*4+E0],ebp     0 Anim move status set direction
+         008B9BE0 fallout3.exe              Disabled mov eax,dword ptr ds:[ecx+2C]           0 Anim pre load
+         006EDBED fallout3.exe              Disabled call esi                                0 GetAsyncKeyState V for cam pov
+         006D5750 fallout3.exe              Disabled sub esp,210                             0 LOAD
+         006D5920 fallout3.exe              Disabled fld st(0),dword ptr ds:[DBCBD0]         0 QL
+         006E0FBE fallout3.exe              Disabled call fallout3.4637F0                    0 QL anim - loop loader
+         0046422E fallout3.exe              Disabled ret 4                                   0 QL anim load
+         006E0765 fallout3.exe              Disabled call fallout3.BFFA60                    0 QL loop
+         00BFFB94 fallout3.exe              Disabled mov dword ptr ds:[edi+ecx*4-18],eax     0 QL loop 2
+         006D5951 fallout3.exe              Disabled call fallout3.6D5750                    0 QL mtff 1
+         006D5811 fallout3.exe              Disabled call fallout3.6D08A0                    0 QL mtff 2
+         006D1016 fallout3.exe              Disabled call fallout3.6CF2B0                    0 QL mtff 3
+         006CF32B fallout3.exe              Disabled call fallout3.AA4B30                    0 QL mtff 4
+         00AA4B89 fallout3.exe              Disabled call fallout3.AA42D0                    0 QL mtff 5
+         00AA4C7E fallout3.exe              Disabled jmp fallout3.AA4BD1                     0 QL mtff inner loop
+         00AA4C3A fallout3.exe              Disabled call dword ptr ds:[<&Sleep>]            0 QL mtff inner loop sleep call
+         00AA4C92 fallout3.exe              Disabled pop edi                                 0 QL mtff post load
+         006276A2 fallout3.exe              Disabled mov byte ptr ds:[1075B28],al            0 after XInputGetState
+         0078AC17 fallout3.exe              Disabled call fallout3.777DB0                    0 always 90s ?
+         0077DD96 fallout3.exe              Disabled test ah,41                              0 cam hunt
+         0082DC1D fallout3.exe              Disabled call edx                                0 cam hunt 2_2
+         0084AA26 fallout3.exe              Disabled fld st(0),dword ptr ds:[edx+C]          0 cam hunt 2_3
+         007754D2 fallout3.exe              Disabled cmp byte ptr ds:[esi+5AA],0             0 camera change pov (press v) esi 5aa
+         0077543E fallout3.exe              Disabled sete bl                                 0 camera change switch init?
+         00C05FCF <fallout3.exe.EntryPoint> One-time call fallout3.C16105                    0 entry breakpoint
+         0076E616 fallout3.exe              Disabled fstp dword ptr ds:[edi+esi*4+324],st(0) 0 leftmobilitycondition modav
+         0071823D fallout3.exe              Disabled call fallout3.582B30                    0 limb - get_limb w/o speed
+         0076AFDC fallout3.exe              Disabled fstp dword ptr ss:[esp+4],st(0)         0 limb IgnoreCrippledLimbs read if was set
+         0076E304 fallout3.exe              Disabled fld st(0),dword ptr ds:[ecx+eax*4+288]  0 limb check 0 - 1d left leg, breakif(eax==1D)
+         0076E333 fallout3.exe              Disabled fadd st(0),dword ptr ss:[esp+C]         0 limb check ?
+         00582B30 fallout3.exe              Disabled push ecx                                0 limb get_limb_health()
+         005845EC fallout3.exe              Disabled call fallout3.582B30                    0 pre_crip
+         006D0FFA fallout3.exe              Disabled mov ecx,dword ptr ss:[esp+60]           0 quickload/save accesses 1hpfastfowardanim
+         0078A0B9 fallout3.exe              Disabled mov edx,dword ptr ds:[ebx]              0 speed backup pre 1
+         0078A127 fallout3.exe              Disabled call fallout3.454010                    0 speed backup pre 3
+         007898A4 fallout3.exe              Disabled fstp dword ptr ss:[esp+34],st(0)        0 speed backup stack set - huh?
+         007E8DDC fallout3.exe              Disabled mov edx,dword ptr ds:[eax+4]            0 speed backup write
+         006E47A3 fallout3.exe              Disabled call edx                                0 speed search 0
+         0076CE04 fallout3.exe              Disabled call fallout3.461690                    0 speed search 1
+         0078A0E4 fallout3.exe              Disabled call fallout3.71F3C0                    0 speed search 2
+         005845B0 fallout3.exe              Disabled fld st(0),dword ptr ss:[esp+8]          0 speed set_speed()
+         00584756 fallout3.exe              Disabled ret                                     0 speed set_speed() if run
+         006F5AC4 fallout3.exe              Disabled mov eax,dword ptr ds:[eax+2C]           0 speed write
+Hardware                                                                                       
+         05E024E0                           Disabled                                         0 0 ANIM MTFF, access(dword)
+         060701CC                           Disabled                                         0 Anim move dir status, access(dword)
+         03483AD4                           Disabled                                         0 CHAR cur anim ptr ?, access(dword)
+         00DE2F7C fallout3.exe              Disabled inc esi                                 0 FastFoward anim text, access(byte)
+         00DD718C fallout3.exe              Disabled dec ecx                                 0 IsPC1stPerson tex, access(byte)
+         00DFDAA0 fallout3.exe              Disabled dec esp                                 0 LeftMobilityCondition, access(byte)
+         00DD1F78 fallout3.exe              Disabled dec ebp                                 0 Movement anim text, access(byte)
+         01075B28 fallout3.exe              Disabled add byte ptr ds:[eax],al                0 XinputGetState, access(dword)
+         05DC7828                           Enabled                                          0 access(dword)
+         05DC7830                           Disabled                                         0 access(dword)
+         1F06D33C                           Disabled                                         0 access(dword)
+         042264F8                           Disabled                                         0 cam pov 1st 3rd - LAG, write(dword), breakif(eip!=789aca && eip!=789b03 && eip!=78a0ca && eip!=78a108 && eip!=78ac35 && eip!=78ac74)
+         04220D1A                           Disabled                                         0 cam pov byte, access(byte)
+         00DF0470 fallout3.exe              Disabled inc bp                                  0 explosion linear text, access(byte)
+         00DE924C fallout3.exe              Disabled inc si                                  0 fFirstPersonCameraMult string, access(byte)
+         00F5EA70 fallout3.exe              Disabled add byte ptr ds:[eax],al                0 fFirstPersonCameraMult val, access(dword)
+         00F610E0 fallout3.exe              Disabled aas                                     0 fMoveLegConditionMult F610E0 , access(dword)
+         00DEEA14 fallout3.exe              Disabled dec bp                                  0 fMoveLegConditionMult, access(byte)
+         00F62298 fallout3.exe              Disabled call far DF0B:dsound.683F5999           0 fMoveOneCrippledLegSpeedMult, access(dword)
+         05E069F4                           Disabled                                         0 mt ff anim, access(dword)
+         0892A2B4                           Disabled                                         0 mt forward anim, access(dword)
+         1006C311                           Disabled                                         0 speed 2 ?, access(byte)
+         04226850                           Disabled                                         0 speed backup, access(dword)
+         2500907C                           Disabled                                         0 speed store, write(dword)
+         07FB7100                           Disabled                                         0 z mtff 3rd hurt !!!! USED 1ST PERSON, access(dword)
+
