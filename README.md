@@ -128,11 +128,11 @@ I could see it was only called under certain circumstances
 (changing armor, drawing/holstering weapons, getting crippled).
 And that triggering calls would usually change the end values.
 
-#### fMoveRunMult referenced (F61098)
+#### fMoveRunMult referenced in wrapper call (F61098)
 
 ![wrapper](./img/moverunmult_wrapper.png)
 
-#### Speed() function called inside wrapper
+#### Speed() function the wrapper calls
 ![speedfunc](./img/speed_func.png)
 
 I noticed the common explanation of speed being increased didn't happen
@@ -142,7 +142,7 @@ when you actually got SC. There would still be the same float value
 My scatter brain got the better of me and I started looking elsewhere.
 
 I gathered a [useful string list](./useful_strings.txt) to get going.
-Most of these were dead ends, some were leftovers from Gamebryo's engine.
+Most of these were dead ends, some were leftovers in Gamebryo's engine.
 Other values seemed unused, or related to the Havok physics engine.
 
 ## Not speed...Where to next?
@@ -206,7 +206,7 @@ But it still didn't seem like it was related to SC directly.
 ## Animations
 \============================================================================
 
-There was still one thing that I didn't look into. 
+There was still one thing that I didn't look into.
 And if you've messed around with SC, there's a really big clue.
 
 When you have SC, you only go faster in 1st person. In 3rd
@@ -219,7 +219,7 @@ crossing other code -  `1hpfastforward.nif`.
 Comparing the `\meshes\characters\_1stPerson\locomotion` normal
 vs "hurt" animations there was an obvious differences.
 
-**FastForward_Hurt** 
+**FastForward_Hurt**
 
 ![1hpff_hurt](./img/1hpff_hurt.png)
 
@@ -236,11 +236,11 @@ Not only was I going about using "Loose Files" wrong, but like
 Cheefii said, "Make sure you have the right file."
 
 1hpfastfoward is **not** the right file. Replacing `fastforward`
-with the `hurt` version wasn't showing in game. But I wasn't
-doing "Loose Files" wrong anymore. Double and triple checking,
-making sure the filenames were right, I had to check memory.
+with the `hurt` version wasn't changing anything in game.
+But I wasn't doing "Loose Files" wrong anymore. Double and triple
+checking, making sure the filenames were right, I had to check memory.
 Searching memory for animation files came back with nothing.
-Searching for parts of animation files came back with nothing. 
+Searching for parts of animation files came back with nothing.
 
 Cycling through the "forward animations, I found the **right animation**
 is `mtfastforward`. This WAS in memory. And it would hit breakpoints.
@@ -249,10 +249,10 @@ Finally got somewhere.
 ![mtff_mem](./img/mtff_mem.png)
 
 It was only part of the file. Because of how things are loaded
-and used, only partial, crucial bits are stored in memory. Some
-leftover info from the beginning of animation files may be
+and used only partial, crucial bits, are stored in memory. Some
+leftover text info from the beginning of animation files may be
 present in memory, but for the most part they get cycled
-through and then the memory is re-used. There was also some
+through and then the memory is re-used. There was some
 data around the animation data itself that wasn't clear.
 
 The animation itself was also a bit different.
@@ -298,7 +298,7 @@ gets routed through a few calls.
 
 This last call has a bunch of hardcoded references before it.
 Some hardcode locations are values, others are pointers, there's
-even tables of functions to be called inside these.
+even some with tables of functions to call dynamically.
 
 ### Animation outer function
 
@@ -376,7 +376,7 @@ Around the animation and size were these highlighted dwords
 (32bits, 4 bytes). These are highlighted by the debugger to signify
 they are possible pointers to data (blue) or code (green).
 Looking at the first one near the end of the animation data, and
-going through a little endian hell, shows it's a reference to the spot
+going through some endian hell, shows it's a reference to the spot
 this animation begins.
 
 I made a [script to crawl animation pointers](anim_crawl.scr) and quickly
@@ -408,7 +408,7 @@ itself with the direct pointer to the animation being used.
 
 ![mtff_ptr2](./img/mtff_mem_ptr2.png)
 
-How to grab crawl the pointer pointers (mind endian)
+How to grab the pointer pointers (mind endian)
 
  - search for animation data
  - search for the animation's start address (4 bytes after the anim length)
@@ -425,14 +425,15 @@ The second pointer has a `current frame` counter next to it.
 ![mtff_ptr2_pos](./img/mtff_mem_ptr2_pos.png)
 
 The first one has a `animation size` (17 hex) and a `chunk size` (10 hex).
-There are 17, 10 chunks (170 bytes total)
+There are 17 chunks of 10 (170 bytes total)
 
 ![mtff_ptr1_sz](./img/mtff_mem_ptr1_sizes.png)
 
-This was nice to know, but SC was still unexplainable. And trying to
+This info was nice to know, but SC was still unexplainable. And trying to
 reverse every animation and data type seemed out of the question.
 
-What happens when these values get loaded - and where do they get loaded?
+I started asking different questions.
+What happens when these values get loaded? Where do they get loaded?
 Maybe animation lengths or sizes are corrupted?
 
 # Quickload (Load with a wrapper)
@@ -443,7 +444,7 @@ Leads to FO3 QL (quickload) function at `6D5920`
 
 ![ql](./img/ql_func.png)
 
-The second call, calls to "load" proper. If you choose a file and load
+The second call, calls to "load: proper". If you choose a file and load
 it, the debugger will break here. (It's right before QL in memory.)
 
 ![load](./img/load_func.png)
@@ -464,7 +465,7 @@ threads getting access/ownership to memory.
 
 Going through QL wasn't leading anywhere. Stepping a single instruction could
 give another thread the OK to run, and debugging threads is hell. FO3 is
-fairly large, too large to be able to collect all information on threads,
+fairly large - too large to be able to collect all information on threads,
 or pause them and step through each. Plus these were relying on each other
 for memory addresses, allocation and probably just signaling - trying to do
 anything fancy only brought crahses.
@@ -478,28 +479,27 @@ a "load", but more of a "check".
 
 ![anim_load_chk](./img/anim_load_check.png)
 
-From what I could tell, this and everything around it was looping through
+From what I could tell, this and the preceding calls were looping through
 every animation in the `Fallout - Meshes.bsa`. Ultimately it was the same
-as trying to poke around QL - one instruction will get `mtfastforward` in
-memory.
+as trying to poke around QL - stepping one instruction may load `mtfastforward`.
 
 (There's a lot of string functions here... Things like
 chop "\characters\_male\locomotion\hurt" to "\locomotion")
 
 One important take away is that the `animation length` from earlier can
 get a `40` (hex) binary `or`'d onto it. I think the `40` signifies a "disabled"
-animation, or maybe un-needed. Some animations in the animation vector have
+animation, or maybe un-needed memory. Some animations in the animation vector have
 this `40` in their length, and those animations were either missing data or it
-was incomplete.
+looked incomplete.
 
 
 # Breakthrough
 \============================================================================
 
 At this point there was still no answer to why SC was happening. I started
-dumping memory and doing mass searches for anmations. Cut up all of the
-locomotion 1st and 3rd person animations and did some compares between a fresh
-game load, one with a bunch of QL-ing, some crippled instances and some with SC.
+dumping memory and doing mass searches for anmations. Cut parts out of all of the
+1st and 3rd person locomotion animations and did some compares between fresh
+game loads, ones with a bunch of QL-ing, some crippled instances and some with SC.
 
 It actually showed something interesting. Animations were not always
 loaded in identically except for a fresh load. There had been times trying
@@ -508,7 +508,7 @@ didn't really think anything of it and figured QL was just loading the same
 stuff in twice, and that it was leftover. But what if it wasn't? Was it
 being re-used? What if SC was using hurt and normal animations together?
 The animation vector was too big to take on, so I decided I'd limit it
-down to only what animations ARE being used.
+down to what animations ARE being used.
 
  - find an animation in memory
  - breakpoint the data
@@ -516,13 +516,13 @@ down to only what animations ARE being used.
 
 I found out that for some reason, **3rd person** had a **`mtfastforward`** animation.
 
-Except it didn't have a `mt` animation for regular movement - 
-it had a **`mtfastforward_hurt`** animation. I tried to hit on it
-and bam - 1st person used the 3rd person animation.
+Except it didn't have a `mt` animation for regular movement -
+only a **`mtfastforward_hurt`** animation. I tried to break on access
+to it and bam - 1st person used the 3rd person animation.
 
 I've been through so many dead ends at this point I was excited and losing
-hope at the same time. I figured I'd try something less involved and half
-assed, and loaded the 3rd person animation in `mtfastforward` and felt crushed
+hope at the same time. I figured I'd try something less debug-y and loaded
+the `mt` 3rd person animation over 1st person, then felt crushed
 
 **1st person (data\meshses\characters\_1stPerson\locomotion)**
 
@@ -594,19 +594,20 @@ You get your limbs and player speed restore to your pre-crippled save.
 
 Normal 1st person animations are loaded.
 
-1st person "hurt" animations don't get loaded
+1st person "hurt" animations don't get loaded.
 
 ### Unwanted glitches
 
 There are still mishaps like reverse speed, or temporary SC. I had these
 happen way less in testing and didn't chase after them, but I have to
-assume it's the same mechanics.
+assume it's the same mechanics causing them.
 
-You can get fast*forward but not fast*right, left, or back.
+You can get fast<u>forward</u> but not fast<u>right</u>, left, or back.
 (IME left was usually a slow direction, maybe it gets loaded first?)
 
-You may disable an "normal" 1st person animation and any check done
-(like another QL) will remove your new 3rd person mtff_hurt animation.
+A "normal" 1st person animation or the new 3rd
+person animation may get disabled (40 hex), and any check done
+(like another QL) will remove them.
 
 Or, maybe you get no 3rd mtff_hurt animation but reduced player speed,
 and there's no compensation from the 3rd person animation doesn't move
@@ -640,14 +641,14 @@ running seemed to drastically reduce my odds, and other's have said the same.
 
 Either way, I'm just glad to know what's going on. I didn't expect to learn
 nearly as much as I did about Fallout 3's code. I thought it'd would be
-a quicker path to more or less the same result. Animations weren't even on
+a quicker path to more or less the same conclusion. Animations weren't even on
 my radar until I dug into everything.
 
 This was my first time really opening a debugger in years. Felt good to get
 where I was going. The universe teasing me at the end with Eden's
 "have a little patience", good stuff.
 
-There are parts I left out that were either time sinks or distractions.
+There are parts I left out like time sinks, distractions, or dumb mistakes.
 
 Hope it's been interesting for at least someone out there.
 
