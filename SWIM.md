@@ -69,7 +69,7 @@ the `mover` class had the current direction of the player.
 ![pc_ptr](./img/pc_ptr.png)
 #### Player Class
 ![pc_class](./img/pc_class.png)
-#### Player Mover
+#### Player Mover Pointer
 ![pc_mover](./img/pc_mover.png)
 #### Player Mover class 'direction' (94 bytes ahead)
 ![pc_mover_dir](./img/pc_mover_dir.png)
