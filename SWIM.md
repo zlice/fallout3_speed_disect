@@ -59,16 +59,18 @@ pointer to a `mover` class 184 bytes ahead of that.
 ![pc_mover_code](./img/pc_mover_code.png)
 
 After realizing bit '11' in the comments for 'swimming' meant 'bit 12' it was
-easy enough to hold a direction, pause, compare memory and see 54 bytes into
+easy enough to hold a direction, pause, compare memory and see 94 bytes into
 the `mover` class had the current direction of the player.
 
-`107A104` points to `3C02384`, +184 bytes is `3C02508` which points to `3C182CC`,
-+94 bytes is `3C18360` which finally points to the direction bits of the player.
+`107A104` points to `3E617F4`, +184 bytes is `3E61978` which points to `3E00F7C`,
++94 bytes is `3E01010` which finally holds the direction bits of the player.
 
 #### Player Pointer
 ![pc_ptr](./img/pc_ptr.png)
 #### Player Class
 ![pc_class](./img/pc_class.png)
+#### Player Mover
+![pc_mover](./img/pc_mover.png)
 #### Player Mover class 'direction' (94 bytes ahead)
 ![pc_mover_dir](./img/pc_mover_dir.png)
 
@@ -90,7 +92,7 @@ right to left map out like this.
 |10|11|sneak|
 |11|12|water|
 
-swim/water bit-> `0000 0000 0000` <-forward bit
+swim/water bit-> `0000 0100 0000` <-forward bit
 
 > Note: none of these seemed to be 'jump' or 'in-air'
 
