@@ -1,4 +1,313 @@
-# Fallout 3 Speed Cripple Disect
+# Fallout 3 Speed Cripple Dissect pt 2
+
+I finally came back to this and came up with a couple (mostly) workable
+solutions for speed cripple :) It's still a headache, and has a lot of
+factors that can ruin your day. But here's the semi-working fixes.
+
+# TLDR pt 2 (fixes)
+
+### What happens? pt 2
+
+The 1st person hurt animation files seem to be in contention with the
+other threads running while loading. If they are slightly slower to load
+and everything else is able to finish for QL before cripple goes through -
+you can get Speed Cripple easier.
+
+### Drop cache memory
+
+Simply dropping "page cache" on Linux or "Standby List/Memory" on
+Windows before restarting the game makes things easier, way easier.
+
+**linux** - `echo 3 > /proc/sys/vm/drop_caches && sync`
+
+On **Windows** I don't have an 'as easy' and verified safe simple tool but
+these should be less trouble that 5 billion restarts or 5 hours of not
+being able to get speed cripple
+
+---
+
+**RamMap** - https://learn.microsoft.com/en-us/sysinternals/downloads/rammap
+
+This is the safest (as it is a Microsoft tool) if you don't want to worry.
+
+Click `Empty > Standby List`
+
+---
+
+**ISLC** - https://www.wagnardsoft.com/forums/viewtopic.php?t=1256
+
+This is the same software person (vendor?) as DDU commonly used to
+fix GPU driver issues.
+
+It's 1 less click ¯\\\_(ツ)_/¯ but, it may flag on virustotal or an
+anti-virus from what I was told
+
+---
+
+**EmptyStandbyList.exe** - https://www.downloadcrew.com/article/34150/empty_standby_list
+
+This is a command line tool that you could double click or run in
+a `cmd` prompt, but I have no idea where it is originally from.
+
+https://www.portablefreeware.com/forums/viewtopic.php?t=25783
+
+This link claims a virus total scan and has a hash, but the original
+wj32 [dot] org site doesn't load for me and I have seen the site
+flagged as bad while searching around.
+
+---
+
+### Files On Slower USB (put it on a floppy lol)
+
+Ok no, but seriously I do want to find an adapter and try a floppy now.
+
+I put the animations responsible for speed cripple on a microSD
+card with a USB adapter, then symlinked 4 files to
+`Fallout3/Data/meshes/characters/_male/locomotion/hurt`.
+This may even be a better option than dropping memory cache.
+
+However, sadly, while my microSD works like a charm, another USB
+drive I have does not seem to work at all. It may be too slow, as
+when I first fired a missile it paused the entire game for a few
+seconds.
+
+You will have to use a bsa extractor like
+[BAE](https://www.nexusmods.com/skyrimspecialedition/mods/974/)
+to grab the required animation files from `Fallout - Meshes.bsa`
+
+##### mtfastbackward_hurt.kf
+##### mtfastleft_hurt.kf
+##### mtfastforward_hurt.kf
+##### mtfastright_hurt.kf
+
+Per file I ran
+
+**linux** `ln -s /usb/anim.kf /path/to/Fallout3/.../hurt/anim.kf`
+
+**windows** `mklink /h C:\path\to\Fallout3\...\hurt\anim.kf E:\anim.kf`
+
+(mklink symbolic links require admin privs for some reason, this is a 'hard' link)
+
+For simplicity, you should be able put the kf files and the appropriate script in
+your FO3 Data directory and run from there
+
+[linux-script](./src/linux-sc-symlink.sh)
+or
+[windows-bat](./src/windows-sc-hardlink.bat)
+
+Obviously you need to 'load loose files' aka `bInvalidateOlderFiles=1` in FalloutPrefs.ini
+
+---
+
+Neither of these are a 100% fix for everyone as you'll see if you read ahead.
+But I had no issue getting SC with them and it mostly worked for someone else
+testing until they had other factors at play.
+
+# Speed Cripple (Thread Theories)
+\============================================================================
+
+There are still a few things to note about speed cripple. It is very
+finicky and quite a few things can go wrong that prevent it from being
+obtainable at all.
+
+## OS Threading (rambling)
+
+There are plenty of 'gotchyas' when it comes to threading. FO3 has tons of
+calls from `CreateThread` (or semaphore or mutex), `WaitForSingleObject` and
+`GetTickCount` (which can have 10-16ms of bad accuracy on 32bit machines).
+
+Without going into too much detail, just know that none of these thread
+related calls or processes are quite perfect. Especially back in the 32bit
+days when dual core CPUs were just created.
+
+## FO3 Threading Overview
+
+There are around 40 threads running for me when I am playing Fallout 3.
+A good chunk of these these are audio related. A dozen or so are DirectX9
+rendering. The rest are a mix of normal, low, and timecritical (high)
+priority Fallout 3 threads. There is a main `BSTaskManagerThread` and
+`BackgroundCloneThread` (some type of backup? it seems inactive).
+Another is helpfully labeled from the `ps` (linux list process) command:
+`Fallout:disk$0`.
+
+The biggest problem, as mentioned originally, is that trying to debug
+threads causes all kinds of problems and most of the times crashes
+FO3 entirely (since it expect some areas to be time sensitive and work
+together in sync).
+
+Without seeing things happen directly, here is what seems to be happening.
+
+## Getting SC
+
+- You get crippled
+- The game starts loading animations
+- You quick load
+- The cripple animations are loading **slower** than expected
+- The cripple load pauses while waiting for disk files
+- All other QL-bound threads **finish** (or at least pause)
+- The game loads goes ahead with QL because the current game 'stopped'
+- The game loads the save file's normal animations
+- The cripple animations resume loading, then stop because they're no longer needed
+- You have speed cripple (or 3rd person only, reverse SC, forward SC only, etc)
+
+There may be something else going on in the last couple steps. Maybe an old
+thread doesn't quit but instead thinks the old game is still going? Could
+be a few things really going on.
+
+# Speed Cripple Still Haunts you
+\============================================================================
+
+## Facts / Show Stoppers
+
+Under normal conditions (not using the tweaks above) you these all seem to
+be true, or are complete true.
+
+**#1.** The save file doesn't really matter
+
+You can restart the game and load the same save you got SC from and hour ago
+but not be able to get it again, or vice versa.
+
+**#2.** 3rd person cripple wobble but normal speed is easy to get
+
+When failing to get SC, you get the 3rd person hurt animation half the time.
+
+**#3.** 3rd person wobble is obtainable with every Fallout thread on a single CPU core
+
+The same hurt animation will happen on a single CPU core.
+
+(However SC does not seem possible even after hours of trying.
+This may be performance related. This may be due to load order by name.)
+
+**#4.** Limb damage is RNG
+
+There is RNG in what limbs take damage when you fire a missile. Some of it
+may come down to timing but it does not seem humanly possible to reproduce
+what limbs get hurt. Looking up instead of down affects what limbs get hurt.
+But loading and pressing a keyboard key for attack can hurt different limbs.
+Cliff cripple by falling, and the extra physics calculations, I'm sure are
+even more RNG.
+
+**#5.** Invincible limbs
+
+This seems harder than SC but I have done it a handful of times. Even with
+a missile straight to my feet, limbs-will-not-damage. Healing so you don't
+die and trying over and over, certain limbs can become invincible.
+
+Obviously, this prevent SC.
+
+**#6.** The game doesn't track everything, always, all the time
+
+From looking at the [Void Swim Glitch](./SWIM.md) it is obvious the game
+is not 100% accurate in player state, game state, anything. There is an area
+54 bytes into the `player` memory that toggles from `102000` (not crippled)
+and `102001` (crippled) that seems tracked well, but funny enough changing
+the value manually does not seem to have any effect.
+
+Another indicator of this is having a 'zoom-in' as if you were trying to aim
+after failing cliff cripple. I never really noticed this until I was testing
+with my casual ini settings, which have a bigger FOV.
+
+**#7.** NG+ seems to make SC easy to get
+
+There are multiple people who have been able to get SC, cripple themselves
+(losing SC), go to the main menu (NOT exit game), and then load a save and
+re-get SC very easy, maybe easier than the above fixes.
+
+This heavily implies there is some type of internal state that helps the
+game get SC even without any quirky setup outside of the game itself. Is
+this memory related? Thread ordering? System thread scheduling or CPU/core
+priority/ordering? It's hard to say.
+
+**#8.** Reverse SC is possible
+
+This is known, but it is important given pickiness of these glitches.
+The 1st person 'hurt' animation applies without the 'boost' animation
+that is responsible for SC.
+
+**#9.** GPU or CPU intensive programs in the background can interfere
+
+Recording or streaming can cause the memory drop cache fixes to not help.
+There have been multiple reports before of people being able to get SC fine
+until they go to record a run.
+
+**#10.** HUD, audio and other threads are always running
+
+The HUD PibBoy limb diagram can stay the same or even get stuck while trying
+to get SC (going haywire with missile and QL can do this at the right frames).
+Quest dialog timers don't seem to care about QL and keep playing.
+Audio still plays differently when in pipboy, vs paused, vs the game in the
+background running. Which leads us to...
+
+**#11.** This is all threading woes
+
+That you can put a file on a slower device and it allows you to get SC with
+ease is a sign of threading, much like many of the above mentions.
+
+There are a lot of variables that attribute to even being able to get SC.
+There may be multiple combinations of things that allow for easy SC. Maybe
+disabling Fallout audio threads somehow helps, closing other programs,
+changing recording settings, lowering resolution or straight making settings
+[potato](./ini/potato/). Even if the game source was revealed, fully
+understanding just how a glitch like this works (especially NG+ SC) may
+never be achievable. There is a lot of chaos going on and it seems like
+SC requires the perfect storm to materialize.
+
+# Future fixes?
+\============================================================================
+
+Given the nature of the glitch, and the ghettoness of the fixes, I am a bit
+stumped when it comes to future fixes.
+
+What could be done?
+
+## Patched Forced Waits
+
+Find where dispatch is done for animation loading and put a call to 'sleep'?
+This would make every load slower by checking every animation load against
+the first person SC related animations and is probably counter productive.
+
+## Auto-thread mover (ThreadOverseer)
+
+Simple enough, start FO3 and move everything to separate threads. Every
+other program would have to be moved off of FO3's threads. This may help
+but given that disk reads are a main factor, this would likely only be a
+partial fix.
+
+## Filesystem file priority?
+
+There are commands like `ionice` that give you some control over what files
+have what priority on disk. This may not help at all (given modern SSDs are
+so fast and FO3 came out when everyone still used HDDs). Windows may not have
+an easy equivalent. It also still requires having loose files, so it's
+probably better to use the USB symlink trick?
+
+## Holy Grail? (NG+ and Animation List)
+
+NG+ seems like the best place to look for a better understanding, but again
+with how threading is related that seems extremely hard to investigate.
+Getting a better understanding of animation lists and the data flow of
+animations when getting SC without any fix may be the only thing that opens
+up any new paths for SC manipulation.
+
+# Outro pt 2
+\============================================================================
+
+Hopefully this helps speedrunners with FO3 and the incredibly notorious SC.
+It's not as deep of a dive as last time and more overall OS and game behavior
+but it gives some insight into what is going on.
+
+Summary? Computers are hard and they've change a lot since Fallout 3 came out.
+
+If you want to read the original it's below.
+
+Thanks for reading.
+
+Good luck, break a leg :]
+
+\============================================================================
+# ORIGINAL (pt1)
+
+# Fallout 3 Speed Cripple Dissect
 
 I was watching a Fallout 3 speedrun and everyone was talking about how horrid
 the Speed Cripple glitch was to get. It always sounded like it was random,
@@ -12,6 +321,7 @@ Speed Cripple glitch consumed me, even if I couldn't fix it.
 Here's what I found.
 
 # Disclaimer (TLDR)
+
 ### Pseudo fix
 
 There still really isn't a fix for this.
@@ -35,7 +345,7 @@ but regular player speed and 1st person animations.
 
 Boom, you now have speed cripple.
 
-# Disect
+# Dissect
 
 ## Where to start?
 \============================================================================
@@ -215,7 +525,7 @@ world speed is obviously slower. I downloaded a BSA file
 extractor and NifSkope to start examining animations.
 
 There was a string I saw referenced a few times in the debugger
-crossing other code -  `1hpfastforward.nif`.
+crossing other code - `1hpfastforward.nif`.
 Comparing the `\meshes\characters\_1stPerson\locomotion` normal
 vs "hurt" animations there was an obvious differences.
 
@@ -697,3 +1007,6 @@ A file with a "name" and "signature" to search on.
 
 [cam pov](./cam_pov.asm)
 
+## Other Glitches
+
+[Void Swim Glitch](./SWIM.md)
