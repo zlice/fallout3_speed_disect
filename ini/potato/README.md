@@ -5,4 +5,4 @@ make menuing impossible. Seeing some items on the ground is way easier
 while other objects become impossible to see unless they have an interact
 action pop up. Use at your own risk. GL
 
-[potato](./../../img/fo3_potato.png)
+![potato](./../../img/fo3_potato.png)

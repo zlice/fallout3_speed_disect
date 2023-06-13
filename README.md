@@ -159,7 +159,7 @@ be a few things really going on.
 
 ## Facts / Show Stoppers
 
-Under normal conditions (not using the tweaks above) you these all seem to
+Under normal conditions (not using the tweaks above) these all seem to
 be true, or are complete true.
 
 **#1.** The save file doesn't really matter
@@ -193,7 +193,7 @@ This seems harder than SC but I have done it a handful of times. Even with
 a missile straight to my feet, limbs-will-not-damage. Healing so you don't
 die and trying over and over, certain limbs can become invincible.
 
-Obviously, this prevent SC.
+Obviously, this can prevent SC.
 
 **#6.** The game doesn't track everything, always, all the time
 
@@ -246,11 +246,11 @@ ease is a sign of threading, much like many of the above mentions.
 There are a lot of variables that attribute to even being able to get SC.
 There may be multiple combinations of things that allow for easy SC. Maybe
 disabling Fallout audio threads somehow helps, closing other programs,
-changing recording settings, lowering resolution or straight making settings
-[potato](./ini/potato/). Even if the game source was revealed, fully
-understanding just how a glitch like this works (especially NG+ SC) may
-never be achievable. There is a lot of chaos going on and it seems like
-SC requires the perfect storm to materialize.
+changing recording settings, increasing/lowering resolution or straight
+making settings [potato](./ini/potato/). Even if the game source was
+revealed, fully understanding just how a glitch like this works
+(especially NG+ SC) may never be achievable. There is a lot of chaos going
+on and it seems like SC requires the perfect storm to materialize.
 
 # Future fixes?
 \============================================================================
@@ -262,9 +262,10 @@ What could be done?
 
 ## Patched Forced Waits
 
-Find where dispatch is done for animation loading and put a call to 'sleep'?
+Find where dispatch is done for animation loading and put a 'sleep'?
 This would make every load slower by checking every animation load against
 the first person SC related animations and is probably counter productive.
+If it worked at all.
 
 ## Auto-thread mover (ThreadOverseer)
 
@@ -273,7 +274,7 @@ other program would have to be moved off of FO3's threads. This may help
 but given that disk reads are a main factor, this would likely only be a
 partial fix.
 
-## Filesystem file priority?
+## Filesystem file priority
 
 There are commands like `ionice` that give you some control over what files
 have what priority on disk. This may not help at all (given modern SSDs are
@@ -283,11 +284,11 @@ probably better to use the USB symlink trick?
 
 ## Holy Grail? (NG+ and Animation List)
 
-NG+ seems like the best place to look for a better understanding, but again
-with how threading is related that seems extremely hard to investigate.
-Getting a better understanding of animation lists and the data flow of
-animations when getting SC without any fix may be the only thing that opens
-up any new paths for SC manipulation.
+NG+ seems like the best place to look for a better understanding but, again,
+being threading related that seems extremely hard to investigate. Getting a
+better understanding of animation lists and the data flow of animations when
+getting SC without any fix may be the only thing that opens up any new paths
+for SC manipulation.
 
 # Outro pt 2
 \============================================================================
